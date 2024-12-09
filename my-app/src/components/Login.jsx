@@ -27,7 +27,7 @@ function Login(props) {
     return (
         <div className="login-dark-container">
             <div className="login-dark-card">
-                <h3 className="text-center mb-4">Login</h3>
+                <h3 className="text-center mb-4 login">Login</h3>
                 <form onSubmit={Submit}>
                     <div className="mb-3">
                         <label htmlFor="cin" className="form-label">
