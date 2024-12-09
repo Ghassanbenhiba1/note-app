@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./Login.css";
 
 function Login(props) {
     const [cin, setCin] = useState("");
@@ -13,10 +14,10 @@ function Login(props) {
                 password,
             });
             console.log(resp.data);
-            localStorage.setItem("token", resp.data.token); 
+            localStorage.setItem("token", resp.data.token);
             localStorage.setItem("first", resp.data.user.first_name);
             localStorage.setItem("last", resp.data.user.last_name);
-            props.setisConect(true); 
+            props.setisConect(true);
         } catch (err) {
             console.error("Login error:", err.response ? err.response.data : err.message);
             alert("Login failed. Please check your credentials.");
@@ -24,8 +25,8 @@ function Login(props) {
     };
 
     return (
-        <div className="container d-flex justify-content-center align-items-center vh-100">
-            <div className="card p-4 shadow" style={{ width: "25rem" }}>
+        <div className="login-dark-container">
+            <div className="login-dark-card">
                 <h3 className="text-center mb-4">Login</h3>
                 <form onSubmit={Submit}>
                     <div className="mb-3">
@@ -36,6 +37,7 @@ function Login(props) {
                             type="text"
                             id="cin"
                             className="form-control"
+                            placeholder="Enter your CIN"
                             value={cin}
                             onChange={(e) => setCin(e.target.value)}
                             required
@@ -49,6 +51,7 @@ function Login(props) {
                             type="password"
                             id="password"
                             className="form-control"
+                            placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -58,6 +61,11 @@ function Login(props) {
                         Login
                     </button>
                 </form>
+                <div className="text-center mt-3">
+                    <small>
+                        Don't have an account? <a href="/register">Register</a>
+                    </small>
+                </div>
             </div>
         </div>
     );

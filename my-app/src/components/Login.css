@@ -1,0 +1,75 @@
+
+.login-dark-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #121212; 
+    color: #ffffff; 
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  
+  .login-dark-card {
+    background-color: #1e1e1e; 
+    border-radius: 10px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+  }
+  
+  
+  .form-label {
+    color: #ffffff;
+  }
+  
+  
+  .form-control {
+    background-color: #2a2a2a; 
+    border: 1px solid #444444;
+    color: #ffffff; 
+    border-radius: 5px;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .form-control::placeholder {
+    color: #888888;
+  }
+  
+  
+  .form-control:focus {
+    border-color: #6c63ff; 
+    box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+  }
+  
+  
+  .btn-primary {
+    background-color: #6c63ff;
+    border: none;
+    transition: all 0.3s ease;
+    color: #ffffff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #4c48da;
+    transform: scale(1.05);
+  }
+  
+  
+  a {
+    color: #6c63ff;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  a:hover {
+    color: #4c48da;
+  }
+  
+  
+  .text-center {
+    color: #ffffff;
+  }
+  

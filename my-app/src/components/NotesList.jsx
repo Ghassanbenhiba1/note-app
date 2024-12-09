@@ -1,37 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import "./NotesListDark.css"; 
 
-function NotesList(props) {
+function NotesList() {
     const [notes, setNotes] = useState([]);
     const [userName, setUserName] = useState("");
     const [userLast, setLast] = useState("");
-
-    const [newNoteTitle, setNewNoteTitle] = useState("");
-    const [newNoteContent, setNewNoteContent] = useState("");
-    const [showAddForm, setShowAddForm] = useState(false);
-
     const [editingNote, setEditingNote] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
-
-    const navigate = useNavigate();
-    const token = localStorage.getItem("token");
+    const [newNoteTitle, setNewNoteTitle] = useState("");
+    const [newNoteContent, setNewNoteContent] = useState("");
+    const [showAddNoteForm, setShowAddNoteForm] = useState(false); 
 
     useEffect(() => {
         fetchNotes();
         const storedName = localStorage.getItem("first");
-        const storedlast = localStorage.getItem("last");
-        if (storedName && storedlast) {
+        const storedLast = localStorage.getItem("last");
+        if (storedName && storedLast) {
             setUserName(storedName);
-            setLast(storedlast);
+            setLast(storedLast);
         }
     }, []);
 
     const fetchNotes = async () => {
         try {
-            const resp = await axios.get("https://notes.devlop.tech/api/notes", {
-                headers: { Authorization: `Bearer ${token}` },
+            const token = localStorage.getItem("token");
+            const resp = await axios.get('https://notes.devlop.tech/api/notes', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
             setNotes(resp.data);
         } catch (err) {
@@ -40,31 +38,36 @@ function NotesList(props) {
         }
     };
 
-    const addNewNote = async () => {
-        if (!newNoteTitle || !newNoteContent) {
-            alert("Please provide a title and content for the note.");
-            return;
-        }
+    const addNewNote = async (e) => {
+        e.preventDefault();
         try {
+            const token = localStorage.getItem("token");
             const resp = await axios.post(
                 "https://notes.devlop.tech/api/notes",
                 { title: newNoteTitle, content: newNoteContent },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
             setNotes([...notes, resp.data]);
             setNewNoteTitle("");
             setNewNoteContent("");
-            setShowAddForm(false); // Hide the form after adding the note
+            setShowAddNoteForm(false); 
         } catch (err) {
             console.error("Error adding note:", err.response ? err.response.data : err.message);
             alert("Failed to add the note. Please try again.");
         }
     };
 
-    const deleteNote = async (noteId) => {
+    const delet = async (noteId) => {
         try {
+            const token = localStorage.getItem('token');
             await axios.delete(`https://notes.devlop.tech/api/notes/${noteId}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
             setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
         } catch (err) {
@@ -73,15 +76,21 @@ function NotesList(props) {
         }
     };
 
-    const updateNote = async (noteId) => {
+    const updateNote = async (noteId, updatedData) => {
         try {
-            const updatedNote = { title: editTitle, content: editContent };
-            await axios.put(`https://notes.devlop.tech/api/notes/${noteId}`, updatedNote, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const token = localStorage.getItem("token");
+            await axios.put(
+                `https://notes.devlop.tech/api/notes/${noteId}`,
+                updatedData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             setNotes((prevNotes) =>
                 prevNotes.map((note) =>
-                    note.id === noteId ? { ...note, ...updatedNote } : note
+                    note.id === noteId ? { ...note, ...updatedData } : note
                 )
             );
             setEditingNote(null);
@@ -91,154 +100,123 @@ function NotesList(props) {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("first");
-        localStorage.removeItem("last");
-        props.setisConect(false);
-        navigate("/");
-    };
-
     return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-4">Notes List</h1>
-            <h4>Welcome, {userName} {userLast}</h4>
-            <div className="mb-3 d-flex justify-content-between">
-                <button className="btn btn-danger" onClick={logout}>Log Out</button>
+        <div className="notes-dark-container">
+            <div className="notes-header">
+                <h1>Notes List</h1>
+                <h4>Welcome, {userName} {userLast}</h4>
+                <div className="header-buttons">
+                    <button className="btn logout-btn" onClick={() => alert('Logged out')}>
+                        Log Out
+                    </button>
+                </div>
+            </div>
+
+            <div className="header-buttons">
                 <button
-                    className="btn btn-success"
-                    onClick={() => setShowAddForm(!showAddForm)}
+                    className="btn add-note-btn"
+                    onClick={() => setShowAddNoteForm(!showAddNoteForm)}
                 >
-                    {showAddForm ? "Close Form" : "Add New Note"}
+                    {showAddNoteForm ? "Cancel" : "Add Note"}
                 </button>
             </div>
 
-            {/* Conditionally render Add New Note Form */}
-            {showAddForm && (
-                <div className="mb-4">
-                    <h5>Add New Note</h5>
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            addNewNote();
-                        }}
-                    >
-                        <div className="mb-3">
-                            <label htmlFor="newNoteTitle" className="form-label">Title</label>
-                            <input
-                                type="text"
-                                id="newNoteTitle"
-                                className="form-control"
-                                value={newNoteTitle}
-                                onChange={(e) => setNewNoteTitle(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="newNoteContent" className="form-label">Content</label>
-                            <textarea
-                                id="newNoteContent"
-                                className="form-control"
-                                value={newNoteContent}
-                                onChange={(e) => setNewNoteContent(e.target.value)}
-                                required
-                            ></textarea>
-                        </div>
-                        <button type="submit" className="btn btn-primary">Save Note</button>
+            {showAddNoteForm && (
+                <div className="add-note-form">
+                    <form onSubmit={addNewNote}>
+                        <input
+                            type="text"
+                            placeholder="New Note Title"
+                            value={newNoteTitle}
+                            onChange={(e) => setNewNoteTitle(e.target.value)}
+                            required
+                        />
+                        <textarea
+                            placeholder="New Note Content"
+                            value={newNoteContent}
+                            onChange={(e) => setNewNoteContent(e.target.value)}
+                            required
+                        />
+                        <button type="submit" className="btn add-note-btn">
+                            Add Note
+                        </button>
                     </form>
                 </div>
             )}
 
             {notes.length > 0 ? (
-                <table className="table table-striped table-bordered">
-                    <thead className="table-dark text-center">
+                <table className="notes-table">
+                    <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Content</th>
-                            <th scope="col">Shared With</th>
-                            <th scope="col">Actions</th>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Content</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {notes.map((note, index) => (
-                            <React.Fragment key={note.id}>
-                                <tr>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{note.title}</td>
-                                    <td>{note.content}</td>
-                                    <td>
-                                        {note.shared_with?.length > 0
-                                            ? note.shared_with.map((user) => user.first_name).join(", ")
-                                            : "Not shared"}
-                                    </td>
-                                    <td>
-                                        <button
-                                            className="btn btn-success mr-2"
-                                            onClick={() => {
-                                                setEditingNote(note);
-                                                setEditTitle(note.title);
-                                                setEditContent(note.content);
-                                            }}
-                                        >
-                                            Update
-                                        </button>
-                                        <button
-                                            className="btn btn-danger"
-                                            onClick={() => deleteNote(note.id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                {editingNote && editingNote.id === note.id && (
-                                    <tr>
-                                        <td colSpan="5">
-                                            <form
-                                                onSubmit={(e) => {
-                                                    e.preventDefault();
-                                                    updateNote(editingNote.id);
-                                                }}
-                                            >
-                                                <div className="mb-3">
-                                                    <label htmlFor="editTitle" className="form-label">Title</label>
-                                                    <input
-                                                        type="text"
-                                                        id="editTitle"
-                                                        className="form-control"
-                                                        value={editTitle}
-                                                        onChange={(e) => setEditTitle(e.target.value)}
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="mb-3">
-                                                    <label htmlFor="editContent" className="form-label">Content</label>
-                                                    <textarea
-                                                        id="editContent"
-                                                        className="form-control"
-                                                        value={editContent}
-                                                        onChange={(e) => setEditContent(e.target.value)}
-                                                        required
-                                                    ></textarea>
-                                                </div>
-                                                <button type="submit" className="btn btn-primary">Save</button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-secondary"
-                                                    onClick={() => setEditingNote(null)}
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                )}
-                            </React.Fragment>
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{note.title}</td>
+                                <td>{note.content}</td>
+                                <td className="actions">
+                                    <button
+                                        className="btn update-btn"
+                                        onClick={() => {
+                                            setEditingNote(note);
+                                            setEditTitle(note.title);
+                                            setEditContent(note.content);
+                                        }}
+                                    >
+                                        Update
+                                    </button>
+                                    <button
+                                        className="btn delete-btn"
+                                        onClick={() => delet(note.id)}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
                         ))}
                     </tbody>
                 </table>
             ) : (
-                <p className="text-center text-muted">No notes available.</p>
+                <p className="no-notes">No notes available.</p>
+            )}
+
+            {editingNote && (
+                <div className="edit-form-container">
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            updateNote(editingNote.id, { title: editTitle, content: editContent });
+                        }}
+                    >
+                        <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            placeholder="Edit Title"
+                            required
+                        />
+                        <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            placeholder="Edit Content"
+                            required
+                        />
+                        <button type="submit" className="btn save-btn">Save</button>
+                        <button
+                            type="button"
+                            className="btn cancel-btn"
+                            onClick={() => setEditingNote(null)}
+                        >
+                            Cancel
+                        </button>
+                    </form>
+                </div>
             )}
         </div>
     );
